@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { WeatherData } from "../../types";
 import { kelvinToCelsius } from "@/lib/celsius-to-fahrenheit";
-import { apiKey } from "../../flags";
+import { apiKey } from "../flags";
 
 export const useWeather = () => {
   const [city, setCity] = useState("cairo");
@@ -14,12 +14,12 @@ export const useWeather = () => {
       setIsLoading(true);
       try {
         const weatherResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/weather?q=${city}&appid=${process.env.NEXT_PUBLIC_API_KEY}`
         );
         const weatherData = await weatherResponse.json();
 
         const forecastResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/forecast?q=${city}&appid=${process.env.NEXT_PUBLIC_API_KEY}`
         );
         const forecastData = await forecastResponse.json();
 
