@@ -1,101 +1,101 @@
+"use client";
+
 import Image from "next/image";
+import { kelvinToCelsius } from "@/lib/celsius-to-fahrenheit";
+import SearchCities from "./search-cities";
+import { useWeather } from "../hooks/use-weather";
+
+const stateBgMap: Record<string, string> = {
+  Clear: "/Clear.jpg",
+  Clouds: "/cloudy.jpg",
+  Rain: "/2_3.jpg",
+  Thunderstorm: "/thunder.jpg",
+  Snow: "/snowy.jpg",
+  Drizzle: "/drizzle.jpg",
+  Fog: "/foggy.jpg",
+  Mist: "/misty.jpg",
+  Haze: "/hazy.jpg",
+  Extreme: "/download.jpg",
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { weatherData, forecastData, temperatureInCelsius, city, setCity, isLoading } = useWeather();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (!weatherData || !forecastData) {
+    return <div className="flex justify-center items-center h-screen">Failed to load weather data</div>;
+  }
+
+  if(weatherData.cod==="404" || forecastData.cod==="404"){
+    return <div className="flex justify-center items-center h-screen text-white">City not found</div>;
+  }
+
+  return (
+    <div
+      className="w-full h-full"
+      style={{
+        backgroundImage: `url(${stateBgMap[weatherData.weather[0].main] || "/default.jpg"})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="flex flex-col items-start w-full max-w-[1500px] px-4 py-6 mx-auto gap-5">
+        <div className="w-full flex items-center gap-2 justify-between">
+          <div className="flex flex-col items-start">
+            <h1 className="text-xl font-bold text-white">
+              {weatherData.name}, {weatherData.sys.country}
+            </h1>
+            <span className="text-[100px] text-white font-medium">
+              {temperatureInCelsius}°
+            </span>
+            <div className="flex items-center gap-2 bg-slate-100 to-blue-100 text-black rounded-sm px-5 py-1 w-full max-w-[150px]">
+              <h1 className="text-xl text-black">
+                {weatherData.weather[0].main}
+              </h1>
+              <span className="text-xl text-black font-medium">
+                {Math.round(kelvinToCelsius(weatherData.main.temp_min))}°/
+                {Math.round(kelvinToCelsius(weatherData.main.temp_max))}°
+              </span>
+            </div>
+          </div>
+          <SearchCities selectCity={setCity}/>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="flex items-center justify-center w-full h-full">
+          <div className="w-full max-w-[500px] p-5 bg-white rounded-md">
+            <h2 className="text-xl font-bold text-center">5-Day Forecast</h2>
+            <div className="flex flex-col gap-4">
+              {forecastData.list
+                ?.slice(0, 5)
+                ?.map((forecast: any, index: number) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-2 border-b"
+                  >
+                    <span className="text-lg font-medium">
+                      {new Date(forecast.dt * 1000).toLocaleDateString()} -{" "}
+                      {new Date(forecast.dt * 1000).toLocaleTimeString()}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={`https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png`}
+                        alt={forecast.weather[0].description}
+                        width={50}
+                        height={50}
+                      />
+                      <span>
+                        {Math.round(kelvinToCelsius(forecast.main.temp))}°C
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
